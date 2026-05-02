@@ -15,3 +15,12 @@
 - [2026-05-02 17:28:00 +02:00] Test: cargo run -p ai-ledger-cli -- --help succeeded and showed init/event commands.
 - [2026-05-02 17:28:00 +02:00] Observation: Git status shows workspace conversion changes, deleted old src hello-world files, and new docs/wiki/crates files.
 - [2026-05-02 17:29:00 +02:00] Activity: Completed initial ai-ledger implementation slice and updated repository memory/session notes before final response.
+- [2026-05-02 17:55:00 +02:00] Activity: Reviewed GitHub PR #1 comments and review threads via GitHub plugin.
+- [2026-05-02 17:55:00 +02:00] Observation: PR review raised required-payload CLI handling, redundant release-gate parsing, non-atomic JSONL append, and non-streaming replay concerns.
+- [2026-05-02 17:55:00 +02:00] Activity: Updated CLI payload parsing, JSONL append, streaming replay, and CLI regression tests for PR review feedback.
+- [2026-05-02 17:57:00 +02:00] Test: First PR-fix verification found rustfmt changes and a type annotation bug in JsonlEventIter.
+- [2026-05-02 17:57:00 +02:00] Activity: Fixed JsonlEventIter parsing result type and ran cargo fmt --all.
+- [2026-05-02 17:59:00 +02:00] Test: cargo fmt --all -- --check passed after PR fixes.
+- [2026-05-02 17:59:00 +02:00] Test: cargo check --workspace passed after PR fixes.
+- [2026-05-02 18:00:00 +02:00] Test: cargo test --workspace passed after PR fixes with 12 total tests, including 5 CLI tests.
+- [2026-05-02 18:00:00 +02:00] Observation: Remaining working tree changes are PR review fixes and the new PR review session memory file.

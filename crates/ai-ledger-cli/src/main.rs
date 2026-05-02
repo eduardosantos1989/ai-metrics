@@ -1,10 +1,10 @@
 use ai_ledger_core::{PrivacyMode, RunId};
 use ai_ledger_event::{
-    DatasetManifestCreatedPayload, EvalCaseFailedPayload, EventEnvelope, EventPayload, GateFailure,
+    DatasetManifestCreatedPayload, EvalCaseFailedPayload, EventEnvelope, EventPayload,
     LlmRequestPayload, ReleaseGateFailedPayload,
 };
 use ai_ledger_log::JsonlEventLog;
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, bail};
 use clap::{Parser, Subcommand, ValueEnum};
 use std::collections::BTreeMap;
 use std::fs;
@@ -159,14 +159,21 @@ fn append_event(
 }
 
 fn replay_events(log: PathBuf, pretty: bool) -> Result<()> {
-    let events = JsonlEventLog::new(&log)
-        .replay()
-        .with_context(|| format!("replay events from {}", log.display()))?;
+    let event_log = JsonlEventLog::new(&log);
 
     if pretty {
+        let events = event_log
+            .replay()
+            .with_context(|| format!("replay events from {}", log.display()))?
+            .collect::<ai_ledger_core::Result<Vec<_>>>()
+            .with_context(|| format!("replay events from {}", log.display()))?;
         println!("{}", serde_json::to_string_pretty(&events)?);
     } else {
-        for event in events {
+        for event in event_log
+            .replay()
+            .with_context(|| format!("replay events from {}", log.display()))?
+        {
+            let event = event.with_context(|| format!("replay events from {}", log.display()))?;
             println!("{}", serde_json::to_string(&event)?);
         }
     }
@@ -178,12 +185,13 @@ fn payload_from_json(
     event_type: CliEventType,
     payload_json: Option<String>,
 ) -> Result<EventPayload> {
-    let raw = payload_json.unwrap_or_else(|| match event_type {
-        CliEventType::LlmRequest => r#"{"status":"success"}"#.to_owned(),
-        CliEventType::DatasetManifestCreated => "{}".to_owned(),
-        CliEventType::EvalCaseFailed => "{}".to_owned(),
-        CliEventType::ReleaseGateFailed => "{}".to_owned(),
-    });
+    let raw = match payload_json {
+        Some(json) => json,
+        None => match event_type {
+            CliEventType::LlmRequest => r#"{"status":"success"}"#.to_owned(),
+            _ => bail!("--payload-json is required for {event_type:?}"),
+        },
+    };
 
     match event_type {
         CliEventType::LlmRequest => Ok(EventPayload::LlmRequest(
@@ -199,27 +207,9 @@ fn payload_from_json(
         )),
         CliEventType::ReleaseGateFailed => Ok(EventPayload::ReleaseGateFailed(
             serde_json::from_str::<ReleaseGateFailedPayload>(&raw)
-                .or_else(|_| parse_release_gate_without_failures(&raw))
                 .context("parse release-gate-failed payload")?,
         )),
     }
-}
-
-fn parse_release_gate_without_failures(raw: &str) -> serde_json::Result<ReleaseGateFailedPayload> {
-    #[derive(serde::Deserialize)]
-    struct Minimal {
-        policy_id: String,
-        candidate_report: String,
-        baseline_report: String,
-    }
-
-    let minimal = serde_json::from_str::<Minimal>(raw)?;
-    Ok(ReleaseGateFailedPayload {
-        policy_id: minimal.policy_id,
-        candidate_report: minimal.candidate_report,
-        baseline_report: minimal.baseline_report,
-        failures: Vec::<GateFailure>::new(),
-    })
 }
 
 fn parse_tag(value: &str) -> Result<(String, String), String> {

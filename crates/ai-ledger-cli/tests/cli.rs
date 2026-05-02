@@ -49,3 +49,59 @@ fn append_and_replay_event_log() {
         .stdout(predicate::str::contains("\"event_type\":\"llm_request\""))
         .stdout(predicate::str::contains("\"service\":\"cli-test\""));
 }
+
+#[test]
+fn non_default_event_types_require_payload_json() {
+    let temp = tempfile::tempdir().expect("tempdir");
+    let log = temp.path().join("events.jsonl");
+
+    let mut append = Command::cargo_bin("ai-ledger").expect("binary exists");
+    append
+        .args([
+            "event",
+            "append",
+            "--run-id",
+            "run_cli",
+            "--event-type",
+            "dataset-manifest-created",
+            "--log",
+        ])
+        .arg(&log)
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("--payload-json is required"));
+}
+
+#[test]
+fn release_gate_payload_defaults_missing_failures_to_empty_vec() {
+    let temp = tempfile::tempdir().expect("tempdir");
+    let log = temp.path().join("events.jsonl");
+
+    let mut append = Command::cargo_bin("ai-ledger").expect("binary exists");
+    append
+        .args([
+            "event",
+            "append",
+            "--run-id",
+            "run_cli",
+            "--event-type",
+            "release-gate-failed",
+            "--payload-json",
+            r#"{"policy_id":"default","candidate_report":"sha256:candidate","baseline_report":"sha256:baseline"}"#,
+            "--log",
+        ])
+        .arg(&log)
+        .assert()
+        .success();
+
+    let mut replay = Command::cargo_bin("ai-ledger").expect("binary exists");
+    replay
+        .args(["event", "replay", "--log"])
+        .arg(&log)
+        .assert()
+        .success()
+        .stdout(predicate::str::contains(
+            "\"event_type\":\"release_gate_failed\"",
+        ))
+        .stdout(predicate::str::contains("\"failures\":[]"));
+}

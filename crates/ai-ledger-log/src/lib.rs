@@ -1,7 +1,7 @@
 use ai_ledger_core::{AiLedgerError, Result};
 use ai_ledger_event::EventEnvelope;
 use std::fs::{File, OpenOptions, create_dir_all};
-use std::io::{BufRead, BufReader, BufWriter, Write};
+use std::io::{BufRead, BufReader, Lines, Write};
 use std::path::{Path, PathBuf};
 
 #[derive(Clone, Debug)]
@@ -25,37 +25,62 @@ impl JsonlEventLog {
             create_dir_all(parent)?;
         }
 
-        let file = OpenOptions::new()
+        let mut line = serde_json::to_vec(event)?;
+        line.push(b'\n');
+
+        OpenOptions::new()
             .create(true)
             .append(true)
-            .open(&self.path)?;
-        let mut writer = BufWriter::new(file);
-        serde_json::to_writer(&mut writer, event)?;
-        writer.write_all(b"\n")?;
-        writer.flush()?;
+            .open(&self.path)?
+            .write_all(&line)?;
         Ok(())
     }
 
-    pub fn replay(&self) -> Result<Vec<EventEnvelope>> {
+    pub fn replay(&self) -> Result<JsonlEventIter> {
         let file = File::open(&self.path)?;
         let reader = BufReader::new(file);
-        let mut events = Vec::new();
+        Ok(JsonlEventIter {
+            lines: reader.lines(),
+            next_line_number: 0,
+        })
+    }
+}
 
-        for (index, line) in reader.lines().enumerate() {
-            let line = line?;
+pub struct JsonlEventIter {
+    lines: Lines<BufReader<File>>,
+    next_line_number: usize,
+}
+
+impl Iterator for JsonlEventIter {
+    type Item = Result<EventEnvelope>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        for line in self.lines.by_ref() {
+            self.next_line_number += 1;
+            let line = match line {
+                Ok(line) => line,
+                Err(source) => return Some(Err(AiLedgerError::Io(source))),
+            };
             if line.trim().is_empty() {
                 continue;
             }
 
-            let event: EventEnvelope =
-                serde_json::from_str(&line).map_err(|source| AiLedgerError::InvalidEvent {
-                    reason: format!("malformed JSONL record on line {}: {source}", index + 1),
-                })?;
-            event.validate()?;
-            events.push(event);
+            let event = serde_json::from_str::<EventEnvelope>(&line).map_err(|source| {
+                AiLedgerError::InvalidEvent {
+                    reason: format!(
+                        "malformed JSONL record on line {}: {source}",
+                        self.next_line_number
+                    ),
+                }
+            });
+
+            return Some(event.and_then(|event| {
+                event.validate()?;
+                Ok(event)
+            }));
         }
 
-        Ok(events)
+        None
     }
 }
 
@@ -91,7 +116,11 @@ mod tests {
         log.append(&sample_event()).expect("append first");
         log.append(&sample_event()).expect("append second");
 
-        let events = log.replay().expect("replay events");
+        let events = log
+            .replay()
+            .expect("open replay iterator")
+            .collect::<Result<Vec<_>>>()
+            .expect("replay events");
         assert_eq!(events.len(), 2);
         assert_eq!(events[0].event_type, ai_ledger_event::EventType::LlmRequest);
     }
@@ -102,7 +131,11 @@ mod tests {
         let path = dir.path().join("events.jsonl");
         fs::write(&path, "{bad json}\n").expect("write malformed");
 
-        let err = JsonlEventLog::new(path).replay().expect_err("malformed");
+        let err = JsonlEventLog::new(path)
+            .replay()
+            .expect("open replay iterator")
+            .collect::<Result<Vec<_>>>()
+            .expect_err("malformed");
         assert!(err.to_string().contains("line 1"));
     }
 }
