@@ -1,7 +1,5 @@
 .claude
 .env
 /target
-/docs
-
-
-
+MEMORY.md
+docs/memory/*.md

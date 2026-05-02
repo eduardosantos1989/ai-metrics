@@ -1,0 +1,24 @@
+[package]
+name = "ai-ledger-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "ai-ledger"
+path = "src/main.rs"
+
+[dependencies]
+ai-ledger-core.workspace = true
+ai-ledger-event.workspace = true
+ai-ledger-log.workspace = true
+anyhow.workspace = true
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+assert_cmd.workspace = true
+predicates.workspace = true
+tempfile.workspace = true

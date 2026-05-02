@@ -1,0 +1,26 @@
+- [2026-05-02 17:12:42 +02:00] Activity: Inspected repository root, docs, src, git status, and starting specification.
+- [2026-05-02 17:12:42 +02:00] Observation: No checked-in AGENTS.md was found; user-provided repository instructions are the active local guidance.
+- [2026-05-02 17:12:42 +02:00] Observation: Repository started as a single minimal Rust package with docs/ai-ledger-codex-starting-spec.md present but docs and wiki ignored by .gitignore.
+- [2026-05-02 17:12:42 +02:00] Activity: Checked cargo version; cargo 1.95.0 is available.
+- [2026-05-02 17:12:42 +02:00] Observation: scripts/append_memory_entry.py is not present, so memory entries are being maintained with apply_patch.
+- [2026-05-02 17:20:00 +02:00] Activity: Converted root Cargo.toml to a Cargo workspace and removed tracked hello-world src files.
+- [2026-05-02 17:20:00 +02:00] Activity: Added ai-ledger-core, ai-ledger-event, ai-ledger-log, ai-ledger-cli, and placeholder crates for manifest/eval/policy/report/export/bench.
+- [2026-05-02 17:20:00 +02:00] Activity: Added README, LICENSE, architecture documentation, wiki starter pages, rustfmt config, and GitHub Actions CI.
+- [2026-05-02 17:20:00 +02:00] Decision: Removed docs/, wiki/, and MEMORY.md from .gitignore because repository memory and wiki docs must be versioned.
+- [2026-05-02 17:22:00 +02:00] Test: cargo fmt --all -- --check reported formatting differences in new CLI files.
+- [2026-05-02 17:22:00 +02:00] Activity: Ran cargo fmt --all to apply repository formatting.
+- [2026-05-02 17:24:00 +02:00] Test: cargo fmt --all -- --check passed.
+- [2026-05-02 17:24:00 +02:00] Test: cargo check --workspace passed.
+- [2026-05-02 17:26:00 +02:00] Test: cargo test --workspace passed with 10 tests across CLI, core, event, and log crates.
+- [2026-05-02 17:28:00 +02:00] Test: cargo run -p ai-ledger-cli -- --help succeeded and showed init/event commands.
+- [2026-05-02 17:28:00 +02:00] Observation: Git status shows workspace conversion changes, deleted old src hello-world files, and new docs/wiki/crates files.
+- [2026-05-02 17:29:00 +02:00] Activity: Completed initial ai-ledger implementation slice and updated repository memory/session notes before final response.
+- [2026-05-02 17:55:00 +02:00] Activity: Reviewed GitHub PR #1 comments and review threads via GitHub plugin.
+- [2026-05-02 17:55:00 +02:00] Observation: PR review raised required-payload CLI handling, redundant release-gate parsing, non-atomic JSONL append, and non-streaming replay concerns.
+- [2026-05-02 17:55:00 +02:00] Activity: Updated CLI payload parsing, JSONL append, streaming replay, and CLI regression tests for PR review feedback.
+- [2026-05-02 17:57:00 +02:00] Test: First PR-fix verification found rustfmt changes and a type annotation bug in JsonlEventIter.
+- [2026-05-02 17:57:00 +02:00] Activity: Fixed JsonlEventIter parsing result type and ran cargo fmt --all.
+- [2026-05-02 17:59:00 +02:00] Test: cargo fmt --all -- --check passed after PR fixes.
+- [2026-05-02 17:59:00 +02:00] Test: cargo check --workspace passed after PR fixes.
+- [2026-05-02 18:00:00 +02:00] Test: cargo test --workspace passed after PR fixes with 12 total tests, including 5 CLI tests.
+- [2026-05-02 18:00:00 +02:00] Observation: Remaining working tree changes are PR review fixes and the new PR review session memory file.

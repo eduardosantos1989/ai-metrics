@@ -1,0 +1,9 @@
+[package]
+name = "ai-ledger-bench"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+ai-ledger-core.workspace = true
