@@ -8,6 +8,7 @@ Last updated: 2026-05-02
 - Cargo workspace skeleton exists with spec-aligned crates.
 - Initial core/event/log/CLI implementation compiles and tests pass.
 - GitHub wiki starter pages exist under wiki/.
+- Local `master` matches `origin/master` at merge commit e4f90d3.
 
 ## Broken
 - Hashing, manifests, eval runner, reports, gates, exporters, and benchmarks are not implemented yet.
@@ -24,3 +25,4 @@ Last updated: 2026-05-02
 - Root package converted to Cargo workspace.
 - Initial JSONL event append/replay loop implemented.
 - docs/, wiki/, and MEMORY.md are no longer ignored.
+- Recovered local master pull by stashing dirty state, backing up ignored memory, pre-creating checkout directories, and fast-forwarding to origin/master.
