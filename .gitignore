@@ -1,5 +1,6 @@
 .claude
 .env
 /target
+/wiki
+/docs/memory
 MEMORY.md
-docs/memory/*.md
