@@ -2,5 +2,5 @@
 .env
 /target
 /wiki
-/docs/memory
+/docs/
 MEMORY.md
