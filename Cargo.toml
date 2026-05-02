@@ -1,6 +1,37 @@
-[package]
-name = "ai-metrics"
+[workspace]
+members = [
+    "crates/ai-ledger-bench",
+    "crates/ai-ledger-cli",
+    "crates/ai-ledger-core",
+    "crates/ai-ledger-eval",
+    "crates/ai-ledger-event",
+    "crates/ai-ledger-export-otel",
+    "crates/ai-ledger-export-splunk",
+    "crates/ai-ledger-log",
+    "crates/ai-ledger-manifest",
+    "crates/ai-ledger-policy",
+    "crates/ai-ledger-report",
+]
+resolver = "3"
+
+[workspace.package]
 version = "0.1.0"
 edition = "2024"
+license = "MIT"
+repository = "https://github.com/ai-observability/ai-metrics"
 
-[dependencies]
+[workspace.dependencies]
+ai-ledger-core = { path = "crates/ai-ledger-core" }
+ai-ledger-event = { path = "crates/ai-ledger-event" }
+ai-ledger-log = { path = "crates/ai-ledger-log" }
+anyhow = "1.0.102"
+assert_cmd = "2.2.1"
+clap = { version = "4.6.1", features = ["derive"] }
+predicates = "3.1.4"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
+tempfile = "3.27.0"
+thiserror = "2.0.18"
+time = { version = "0.3.47", features = ["formatting", "serde"] }
+toml = "1.1.2+spec-1.1.0"
+uuid = { version = "1.23.1", features = ["serde", "v7"] }
