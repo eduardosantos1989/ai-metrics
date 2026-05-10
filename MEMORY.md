@@ -31,3 +31,9 @@
 - [2026-05-02 18:17:00 +02:00] Activity: Stashed partial failed-checkout states, pre-created the directory tree from origin/master, and retried the fast-forward pull.
 - [2026-05-02 18:18:00 +02:00] Test: git pull --ff-only origin master succeeded; local master now matches origin/master at e4f90d3.
 - [2026-05-02 18:19:00 +02:00] Test: A follow-up git pull --ff-only origin master returned Already up to date.
+- [2026-05-10 09:51:54 +02:00] Activity: Began Rust Native code review of the workspace on clean master.
+- [2026-05-10 09:51:54 +02:00] Test: rust-native cargo check --all-targets passed with no diagnostics.
+- [2026-05-10 09:51:54 +02:00] Test: rust-native rustfmt check failed due local CRLF newline style conflicting with rustfmt.toml newline_style Unix.
+- [2026-05-10 09:51:54 +02:00] Test: rust-native clippy --all-targets --all-features -- -D warnings failed on derivable Default impls in ai-ledger-core.
+- [2026-05-10 09:51:54 +02:00] Test: cargo test --workspace passed with 12 tests.
+- [2026-05-10 09:51:54 +02:00] Observation: CI workflow is configured for push branches main while the repository branch in use is master.
